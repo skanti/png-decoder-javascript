@@ -1,0 +1,14 @@
+# hidden files
+.*
+*.js.mem
+
+# generated
+node_modules
+*.o
+*.a
+*.lo
+*.so
+*.pc
+
+# exceptino
+!.gitignore
