@@ -10,7 +10,6 @@ PNG_SRC:= \
 	src/png/pngrtran.c \
 	src/png/pngrutil.c \
 	src/png/pngset.c \
-	src/png/pngtest.c \
 	src/png/pngtrans.c \
 	src/png/pngwio.c \
 	src/png/pngwrite.c \
@@ -47,17 +46,17 @@ Z_SRC:= \
 
 Z_OBJ:= $(Z_SRC:.c=.o)
 
-all : LoaderPNG.js
+all : LoaderPNG.js 
 
 
-LoaderPNG.js : LoaderPNG.cpp  src/libpng.a src/zlib/libz.a
-	em++ -L./src/zlib -L./src --bind $(INCLUDES) --memory-init-file 0 -s MODULARIZE=1 -O3 -std=c++14 -DNDEBUG -DUSE_ZLIB=1 -o $@ $< -lpng -lz
+LoaderPNG.js : LoaderPNG.cpp  src/libpng.a
+	em++ -L./src/zlib -L./src --bind $(INCLUDES) --memory-init-file 0 -s MODULARIZE=1 -s ALLOW_MEMORY_GROWTH=1 -std=c++14 -DNDEBUG -DUSE_ZLIB=1 -o $@ $< -lpng -lz
 
 %.o : %.c
-	emcc --bind $(INCLUDES) --memory-init-file 0 -s MODULARIZE=1 -O3 -DNDEBUG -D_LARGEFILE64_SOURCE=1 -o $@ -c $^
+	emcc --bind $(INCLUDES)  -DNDEBUG -D_LARGEFILE64_SOURCE=1 -o $@ -c $^
 
 src/libpng.a : $(PNG_OBJ)
-	emar rvs $@ $^
+	emar rc $@ $^
 
 # TO COMPILE ZLIB:
 # - GoTo src/zlib
@@ -67,4 +66,5 @@ src/libpng.a : $(PNG_OBJ)
 #	emar rvs $@ $^
 
 clean:
-	rm -f LoaderPNG.js ./src/*.a ./src/png/*.o ./src/zlib/*.o
+	rm -f LoaderPNG.js ./src/*.a
+	#rm -f LoaderPNG.js ./src/*.a ./src/png/*.o ./src/zlib/*.o

@@ -1,4 +1,5 @@
-import CMAES from "./CMAES";
+import LoaderPNG from "./LoaderPNG";
+import fs from "fs";
 
 function dummy() {
     return new Promise((resolve, reject) => {
@@ -6,20 +7,51 @@ function dummy() {
 	});
 }
 
+
+function xhr(type, url) {
+    return new Promise((resolve, reject) => {
+        let xhr0 = new XMLHttpRequest();
+        xhr0.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                resolve(this.response);
+            }
+        };
+        xhr0.open(type, url, true);
+        xhr0.send();
+    });
+};
+
+function array2heap(arr, module) {
+	let nDataBytes = arr.length*arr.BYTES_PER_ELEMENT
+	let dataPtr = module._malloc(nDataBytes);
+
+	let dataHeap = new Uint8Array(module.HEAPU8.buffer, dataPtr, nDataBytes);
+	dataHeap.set(new Uint8Array(arr.buffer));
+
+	return dataHeap;
+}
+
 function run() {
 
-	let pa = [0.31259587832859587,0.18183369508811406,-0.1985829451254436,0.30956936308315824,0.18325744143554143,0.27386997853006634,0.31092539855412077,-0.24102318712643214,-0.19934268082891193,0.3083037180559976,-0.24369886943272182,0.26373498354639324,-0.41887309721537996,0.18325787356921605,-0.20897817398820606,-0.41978328994342257,0.18285575083323888,0.2791437378951481,-0.4027379708630698,-0.24648270436695643,-0.2098449000290462];
-	let pb = [-0.7045189014502934,0.31652495664145264,-0.8913587885243552,0.4196143278053829,0.33125081405575785,-1.148712511573519,-0.7211957446166447,-0.4204243223315903,-0.8922857301575797,0.41556308950696674,-0.36760757371251074,-1.1630155401570457,-0.12535642300333297,0.26708755761917147,1.5095344824450356,0.9968448409012386,0.27593113974268946,1.2189108175890786,-0.28095118914331707,-0.40276257201497045,1.3669272703783852]; 
-	let cmaes = new CMAES();
-	let res = cmaes.minimize(pa, pb);
+	fs.readFile('./test.png', function read(err, data) {
+		if (err)
+			throw err;
 
-	console.log(res.size());
-	let cost = res.get(res.size() - 1)
-	let params = []
-	for (let i = 0; i < res.size() - 1; i++)
-		params.push(res.get(i))
+		let png = new LoaderPNG();
 
-	console.log(params, cost)
+		let in_heap = array2heap(data, png)
+
+		let out_ptr = png._malloc(4*4*3);
+		let out_heap = new Uint8Array(png.HEAPU8.buffer, out_ptr, 4*4*3);
+
+		png.load("dummy", in_heap.byteOffset, out_heap.byteOffset, 4, 4, 3);
+		let result = new Uint8Array(out_heap.buffer, out_heap.byteOffset, out_heap.length);
+		console.log(result)
+		
+		png._free(in_heap.byteOffset);
+		png._free(out_heap.byteOffset);
+
+	});
 }
 
 

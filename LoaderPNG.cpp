@@ -3,8 +3,30 @@
 
 using namespace emscripten;
 
-void load(std::string filename, unsigned char *image, int width, int height, int n_channels) {
-	FILE *fp = fopen(filename.c_str(), "rb");
+typedef struct {
+    const png_byte* data;
+    const png_size_t size;
+} DataHandle;
+
+typedef struct {
+    const DataHandle data;
+    png_size_t offset;
+} ReadDataHandle;
+
+void ReadDataFromInputStream(
+    png_structp png_ptr, png_byte* raw_data, png_size_t read_length) {
+
+    ReadDataHandle* handle = (ReadDataHandle*)png_get_io_ptr(png_ptr);
+    const png_byte* png_src = handle->data.data + handle->offset;
+
+    memcpy(raw_data, png_src, read_length);
+    handle->offset += read_length;
+}
+
+void load(std::string filename, uintptr_t input0, uintptr_t output, int width, int height, int n_channels) {
+
+	png_voidp input = reinterpret_cast<png_voidp>(input0);
+	uint8_t* image = reinterpret_cast<uint8_t*>(output);
 
 	png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!png) throw std::runtime_error("png_create_read_struct failed\n");
@@ -14,7 +36,9 @@ void load(std::string filename, unsigned char *image, int width, int height, int
 
 	if (setjmp(png_jmpbuf(png))) throw std::runtime_error("png_jmpbuf error.\n");;
 
-	png_init_io(png, fp);
+	//png_init_io(png, fp);
+	png_set_read_fn(png, &input, ReadDataFromInputStream);
+	//png_set_sig_bytes(png, kPngSignatureLength);
 
 	png_read_info(png, info);
 
@@ -70,7 +94,6 @@ void load(std::string filename, unsigned char *image, int width, int height, int
 		free(row_pointers[y]);
 	}
 
-	fclose(fp);
 }
 
 EMSCRIPTEN_BINDINGS(my_module) {

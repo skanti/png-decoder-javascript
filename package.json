@@ -1,0 +1,11 @@
+{
+  "name": "dummy",
+  "version": "1.0.0",
+  "description": "sandbox",
+  "main": "index.js",
+  "dependencies": {
+    "request": "^2.81.0"
+  },
+  "author": "Armen Avetisyan",
+  "license": "ISC"
+}
