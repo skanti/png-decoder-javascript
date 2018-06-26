@@ -41,12 +41,12 @@ function run() {
 
 		let in_heap = array2heap(data, png)
 
-		let out_ptr = png._malloc(4*4*3);
-		let out_heap = new Uint8Array(png.HEAPU8.buffer, out_ptr, 4*4*3);
+		let out_ptr = png._malloc(10*1000*1000*3);
+		let out_heap = new Uint8Array(png.HEAPU8.buffer, out_ptr, 10*1000*1000*3);
 
-		png.load("dummy", in_heap.byteOffset, out_heap.byteOffset, 4, 4, 3);
+		png.load(in_heap.byteOffset, out_heap.byteOffset, 4, 4, 3);
 		let result = new Uint8Array(out_heap.buffer, out_heap.byteOffset, out_heap.length);
-		console.log(result)
+		//console.log(result)
 		
 		png._free(in_heap.byteOffset);
 		png._free(out_heap.byteOffset);

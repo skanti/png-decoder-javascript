@@ -50,7 +50,7 @@ all : LoaderPNG.js
 
 
 LoaderPNG.js : LoaderPNG.cpp  src/libpng.a
-	em++ -L./src/zlib -L./src --bind $(INCLUDES) --memory-init-file 0 -s MODULARIZE=1 -s ALLOW_MEMORY_GROWTH=1 -std=c++14 -DNDEBUG -DUSE_ZLIB=1 -o $@ $< -lpng -lz
+	em++ -L./src/zlib -L./src --bind $(INCLUDES) --memory-init-file 0 -s MODULARIZE=1 -s ALLOW_MEMORY_GROWTH=1 --no-heap-copy -s TOTAL_MEMORY=256MB -std=c++14 -DNDEBUG -DUSE_ZLIB=1 -o $@ $< -lpng -lz
 
 %.o : %.c
 	emcc --bind $(INCLUDES)  -DNDEBUG -D_LARGEFILE64_SOURCE=1 -o $@ -c $^

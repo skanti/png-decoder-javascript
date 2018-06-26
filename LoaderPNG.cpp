@@ -23,7 +23,7 @@ void ReadDataFromInputStream(
     handle->offset += read_length;
 }
 
-void load(std::string filename, uintptr_t input0, uintptr_t output, int width, int height, int n_channels) {
+void load(uintptr_t input0, uintptr_t output, int width, int height, int n_channels) {
 
 	png_voidp input = reinterpret_cast<png_voidp>(input0);
 	uint8_t* image = reinterpret_cast<uint8_t*>(output);
