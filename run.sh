@@ -1,1 +1,1 @@
-node --experimental-modules --napi-modules main.mjs
+node --experimental-modules --napi-modules example.mjs
