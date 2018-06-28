@@ -1,4 +1,4 @@
-# libpng-javascript
+# png-decoder-javascript
 An aggressively optimized png loader for javascript that decodes `png` images `8x` faster than alternatives. See benchmark:
 
 ## Benchmark 
